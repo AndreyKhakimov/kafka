@@ -1,6 +1,7 @@
 import com.launchdarkly.eventsource.EventHandler;
 import com.launchdarkly.eventsource.EventSource;
 import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.example.WikimediaChangeHandler;
 
@@ -18,6 +19,16 @@ public class WikimediaChangesProducer {
         properties.setProperty("bootstrap.servers", bootStrapServers);
         properties.setProperty("key.serializer", StringSerializer.class.getName());
         properties.setProperty("value.serializer", StringSerializer.class.getName());
+
+        // set safe producer configs (Kafka <= 2.8)
+//        properties.setProperty(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, "true");
+//        properties.setProperty(ProducerConfig.ACKS_CONFIG, "all"); // same as -1
+//        properties.setProperty(ProducerConfig.RETRIES_CONFIG, Integer.toString(Integer.MAX_VALUE));
+
+        // set high throughput producer configs
+        properties.setProperty(ProducerConfig.LINGER_MS_CONFIG, "20");
+        properties.setProperty(ProducerConfig.BATCH_SIZE_CONFIG, Integer.toString(32 * 1024));
+        properties.setProperty(ProducerConfig.COMPRESSION_TYPE_CONFIG, "snappy");
 
         // create the producer
         KafkaProducer<String, String> producer = new KafkaProducer<>(properties);
