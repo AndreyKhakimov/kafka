@@ -32,9 +32,7 @@ public class ConsumerDemo {
         //create consumer configs
         properties.setProperty("key.deserializer", StringDeserializer.class.getName());
         properties.setProperty("value.deserializer", StringDeserializer.class.getName());
-
         properties.setProperty("group.id", groupId);
-
         properties.setProperty("auto.offset.reset", "earliest");
 
         // create consumer
